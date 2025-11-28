@@ -12,8 +12,13 @@ interface GameContextType {
   clickForge: () => void;
   buyBuilding: (buildingId: string) => void;
   buyUpgrade: (upgradeId: string) => void;
+  buyMetaUpgrade: (upgradeId: string) => void;
   collapseUniverse: () => Promise<void>;
   selectTraits: (traitIds: TraitId[]) => void;
+  claimDailyTask: (taskId: string) => void;
+  completeTutorialStep: (step: string) => void;
+  dismissTutorial: () => void;
+  claimOfflineGains: () => void;
   saveGame: () => Promise<void>;
   isLoading: boolean;
 }
@@ -210,6 +215,81 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const buyMetaUpgrade = useCallback((upgradeId: string) => {
+    setState((prev) => {
+      const currentLevel = prev.metaUpgrades[upgradeId] || 0;
+      const upgrade = require('../game/content/metaUpgrades').META_UPGRADES[upgradeId];
+      if (!upgrade) return prev;
+
+      const cost = require('../game/content/metaUpgrades').getMetaUpgradeCost(upgrade, currentLevel);
+      if (prev.echoes < cost || currentLevel >= upgrade.maxLevel) return prev;
+
+      return {
+        ...prev,
+        echoes: prev.echoes - cost,
+        metaUpgrades: {
+          ...prev.metaUpgrades,
+          [upgradeId]: currentLevel + 1,
+        },
+      };
+    });
+  }, []);
+
+  const claimDailyTask = useCallback((taskId: string) => {
+    setState((prev) => {
+      const taskIndex = prev.dailyTasks.findIndex((t) => t.taskId === taskId);
+      if (taskIndex === -1) return prev;
+
+      const task = prev.dailyTasks[taskIndex];
+      if (!task.completed || task.claimed) return prev;
+
+      const taskDef = require('../game/content/dailyTasks').DAILY_TASKS.find((t: any) => t.id === taskId);
+      if (!taskDef) return prev;
+
+      const newState = { ...prev };
+      newState.dailyTasks = [...prev.dailyTasks];
+      newState.dailyTasks[taskIndex] = { ...task, claimed: true };
+
+      if (taskDef.reward.echoes) {
+        newState.echoes += taskDef.reward.echoes;
+      }
+      if (taskDef.reward.sparks) {
+        newState.sparks += taskDef.reward.sparks;
+      }
+
+      return newState;
+    });
+  }, []);
+
+  const completeTutorialStep = useCallback((step: string) => {
+    setState((prev) => ({
+      ...prev,
+      tutorial: {
+        ...prev.tutorial,
+        completedSteps: [...prev.tutorial.completedSteps, step],
+        currentStep: null,
+      },
+    }));
+  }, []);
+
+  const dismissTutorial = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      tutorial: {
+        ...prev.tutorial,
+        dismissed: true,
+        currentStep: null,
+      },
+    }));
+  }, []);
+
+  const claimOfflineGains = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      offlineGainsClaimed: true,
+    }));
+  }, []);
+
   const collapseUniverse = useCallback(async () => {
     const newState = await collapseUniverseApi(state);
     setState(checkAchievements(newState));
@@ -221,8 +301,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     clickForge,
     buyBuilding,
     buyUpgrade,
+    buyMetaUpgrade,
     collapseUniverse,
     selectTraits,
+    claimDailyTask,
+    completeTutorialStep,
+    dismissTutorial,
+    claimOfflineGains,
     saveGame,
     isLoading,
   };

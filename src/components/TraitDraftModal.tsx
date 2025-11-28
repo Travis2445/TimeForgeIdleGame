@@ -7,6 +7,7 @@ import { getRandomTraits } from '../game/traits';
 interface TraitDraftModalProps {
   onSelect: (traitIds: TraitId[]) => void;
   runNumber: number;
+  maxSelection?: number;
 }
 
 const RARITY_COLORS = {
@@ -23,10 +24,9 @@ const RARITY_TEXT_COLORS = {
   mythic: 'text-purple-400',
 };
 
-export function TraitDraftModal({ onSelect, runNumber }: TraitDraftModalProps) {
+export function TraitDraftModal({ onSelect, runNumber, maxSelection = 2 }: TraitDraftModalProps) {
   const [availableTraits, setAvailableTraits] = useState<TraitId[]>([]);
   const [selectedTraits, setSelectedTraits] = useState<TraitId[]>([]);
-  const maxSelection = 2;
 
   useEffect(() => {
     const traits = getRandomTraits(5);

@@ -67,6 +67,19 @@ export interface Achievement {
   };
 }
 
+export interface DailyTaskProgress {
+  taskId: string;
+  progress: number;
+  completed: boolean;
+  claimed: boolean;
+}
+
+export interface TutorialState {
+  completedSteps: string[];
+  currentStep: string | null;
+  dismissed: boolean;
+}
+
 export interface GameState {
   version: number;
 
@@ -89,11 +102,27 @@ export interface GameState {
   runNumber: number;
   runStartTime: string;
   lastTickTime: string;
+  lastUpdateTime: string;
   totalRunTime: number;
 
   totalClicks: number;
   totalSparksEarned: number;
   totalFluxEarned: number;
+
+  currentStageId: string;
+  highestStageReached: string;
+
+  metaUpgrades: Record<string, number>;
+
+  dailyTasks: DailyTaskProgress[];
+  dailyTasksLastReset: string;
+  dailyCollapses: number;
+  dailyRareTraitRuns: number;
+  dailyBuildingsPurchased: number;
+
+  tutorial: TutorialState;
+
+  offlineGainsClaimed: boolean;
 
   soundOn: boolean;
   autoSaveEnabled: boolean;

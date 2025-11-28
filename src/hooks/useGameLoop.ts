@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { GameState } from '../types/game';
 import { getTotalProduction, checkAchievements } from '../game/logic';
+import { getStageFromFlux, initializeDailyTasks, updateDailyTaskProgress, applyMetaUpgrades } from '../game/helpers';
 
 const TICK_RATE = 200;
 
@@ -46,7 +47,7 @@ export function useGameLoop(
           anomalyTimerRef.current = 0;
         }
 
-        const newState = {
+        let newState = {
           ...prev,
           flux: prev.flux + fluxGained,
           civilization: prev.civilization + civilizationGained,
@@ -54,7 +55,20 @@ export function useGameLoop(
           totalFluxEarned: prev.totalFluxEarned + fluxGained,
           totalRunTime: prev.totalRunTime + deltaSeconds,
           lastTickTime: new Date(now).toISOString(),
+          lastUpdateTime: new Date(now).toISOString(),
         };
+
+        const newStageId = getStageFromFlux(newState);
+        if (newStageId !== newState.currentStageId) {
+          newState = {
+            ...newState,
+            currentStageId: newStageId,
+            highestStageReached: newStageId,
+          };
+        }
+
+        newState = initializeDailyTasks(newState);
+        newState = updateDailyTaskProgress(newState);
 
         return checkAchievements(newState);
       });
