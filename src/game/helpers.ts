@@ -213,3 +213,28 @@ export function updateDailyTaskProgress(state: GameState): GameState {
     dailyTasks: updatedTasks,
   };
 }
+
+export function calculateBuildingSynergies(state: GameState): Record<string, number> {
+  const synergies: Record<string, number> = {};
+
+  const reactorCount = state.buildings.reactor?.count || 0;
+  const worldCount = state.buildings.world?.count || 0;
+
+  if (reactorCount > 0) {
+    synergies.lab = 1 + (reactorCount * 0.02);
+  }
+
+  if (worldCount > 0) {
+    synergies.civilization = 1 + (worldCount * 0.03);
+  }
+
+  if (state.runNumber > 0) {
+    synergies.world = 1 + (state.runNumber * 0.01);
+  }
+
+  Object.keys(synergies).forEach(key => {
+    if (!synergies[key]) synergies[key] = 1;
+  });
+
+  return synergies;
+}

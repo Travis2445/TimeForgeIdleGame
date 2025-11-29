@@ -19,6 +19,8 @@ interface GameContextType {
   completeTutorialStep: (step: string) => void;
   dismissTutorial: () => void;
   claimOfflineGains: () => void;
+  setPurchaseMode: (mode: 1 | 10 | 25 | 100 | 'max') => void;
+  updateSettings: (settings: Partial<GameState['settings']>) => void;
   saveGame: () => Promise<void>;
   isLoading: boolean;
 }
@@ -290,6 +292,23 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const setPurchaseMode = useCallback((mode: 1 | 10 | 25 | 100 | 'max') => {
+    setState((prev) => ({
+      ...prev,
+      purchaseMode: mode,
+    }));
+  }, []);
+
+  const updateSettings = useCallback((newSettings: Partial<GameState['settings']>) => {
+    setState((prev) => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        ...newSettings,
+      },
+    }));
+  }, []);
+
   const collapseUniverse = useCallback(async () => {
     const newState = await collapseUniverseApi(state);
     setState(checkAchievements(newState));
@@ -308,6 +327,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     completeTutorialStep,
     dismissTutorial,
     claimOfflineGains,
+    setPurchaseMode,
+    updateSettings,
     saveGame,
     isLoading,
   };

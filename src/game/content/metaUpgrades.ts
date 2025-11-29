@@ -1,4 +1,5 @@
 export type MetaUpgradeColumn = 'power' | 'tempo' | 'weirdness';
+export type MetaUpgradeArchetype = 'clicker' | 'idle' | 'civilization';
 
 export interface MetaUpgradeEffect {
   type: 'multiplier' | 'additive' | 'special';
@@ -17,13 +18,14 @@ export interface MetaUpgrade {
   maxLevel: number;
   effects: MetaUpgradeEffect[];
   prerequisite?: string;
+  archetype?: MetaUpgradeArchetype;
 }
 
 export const META_UPGRADES: Record<string, MetaUpgrade> = {
   power_click_1: {
     id: 'power_click_1',
     name: 'Forge Mastery',
-    description: 'Each click generates +50% Sparks',
+    description: 'Each click generates +50% Sparks (Clicker build)',
     column: 'power',
     tier: 1,
     baseCost: 3,
@@ -32,11 +34,12 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
     effects: [
       { type: 'multiplier', key: 'clickPower', valuePerLevel: 1.5 },
     ],
+    archetype: 'clicker',
   },
   power_buildings_1: {
     id: 'power_buildings_1',
     name: 'Industrial Revolution',
-    description: 'All buildings produce +25% more',
+    description: 'All buildings produce +25% more (Idle build)',
     column: 'power',
     tier: 2,
     baseCost: 5,
@@ -45,6 +48,7 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
     effects: [
       { type: 'multiplier', key: 'buildingProduction', valuePerLevel: 1.25 },
     ],
+    archetype: 'idle',
   },
   power_flux_1: {
     id: 'power_flux_1',
@@ -62,7 +66,7 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
   power_civilization_1: {
     id: 'power_civilization_1',
     name: 'Cultural Enlightenment',
-    description: 'Civilization production +40%',
+    description: 'Civilization production +40% (Civilization build)',
     column: 'power',
     tier: 4,
     baseCost: 20,
@@ -71,6 +75,7 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
     effects: [
       { type: 'multiplier', key: 'civilizationMultiplier', valuePerLevel: 1.4 },
     ],
+    archetype: 'civilization',
   },
   power_ultimate: {
     id: 'power_ultimate',
@@ -116,7 +121,7 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
   tempo_offline_1: {
     id: 'tempo_offline_1',
     name: 'Idle Mastery',
-    description: 'Offline time cap +2 hours, gains +20%',
+    description: 'Offline time cap +2 hours, gains +20% (Idle build)',
     column: 'tempo',
     tier: 3,
     baseCost: 8,
@@ -126,6 +131,7 @@ export const META_UPGRADES: Record<string, MetaUpgrade> = {
       { type: 'additive', key: 'offlineCapHours', valuePerLevel: 2 },
       { type: 'multiplier', key: 'offlineGains', valuePerLevel: 1.2 },
     ],
+    archetype: 'idle',
   },
   tempo_echoes_1: {
     id: 'tempo_echoes_1',

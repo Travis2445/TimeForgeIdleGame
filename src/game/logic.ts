@@ -4,7 +4,7 @@ import { createUpgrades } from './upgrades';
 import { createAchievements } from './achievements';
 import { TRAITS } from './traits';
 import { getRandomDailyTasks } from './content/dailyTasks';
-import { applyMetaUpgrades, applyStageMultipliers } from './helpers';
+import { applyMetaUpgrades, applyStageMultipliers, calculateBuildingSynergies } from './helpers';
 
 export function createInitialState(): GameState {
   const now = new Date().toISOString();
@@ -62,6 +62,16 @@ export function createInitialState(): GameState {
     },
 
     offlineGainsClaimed: false,
+
+    purchaseMode: 1,
+    lastRunTraits: [],
+    peakFluxPerSecond: 0,
+
+    settings: {
+      soundOn: true,
+      animationsOn: true,
+      numberFormat: 'shorthand',
+    },
 
     soundOn: true,
     autoSaveEnabled: true,
@@ -159,6 +169,11 @@ export function calculateBuildingProduction(
     production *= stageBonuses.fluxMultiplier;
   } else {
     production *= stageBonuses.civilizationMultiplier;
+  }
+
+  const synergies = calculateBuildingSynergies(state);
+  if (synergies[building.id]) {
+    production *= synergies[building.id];
   }
 
   return production;

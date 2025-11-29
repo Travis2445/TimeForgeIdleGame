@@ -124,6 +124,16 @@ export interface GameState {
 
   offlineGainsClaimed: boolean;
 
+  purchaseMode: 1 | 10 | 25 | 100 | 'max';
+  lastRunTraits: TraitId[];
+  peakFluxPerSecond: number;
+
+  settings: {
+    soundOn: boolean;
+    animationsOn: boolean;
+    numberFormat: 'shorthand' | 'scientific';
+  };
+
   soundOn: boolean;
   autoSaveEnabled: boolean;
 }
